@@ -1,0 +1,202 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="Login"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:maes="clr-namespace:Microsoft.Activities.Extensions.Statements;assembly=Microsoft.Activities.Extensions"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:s="clr-namespace:System;assembly=mscorlib"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_ApplicationWindow" Type="InArgument(ui:Window)" />
+    <x:Property Name="out_ApplicationWindow" Type="OutArgument(ui:Window)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Login_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Plugin.Workflow</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Workflow perform actions in order to login to application #ApplicationName#" DisplayName="Login to  #ApplicationName#" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="scg:Dictionary(x:String, x:Object)" Name="appInfo" />
+    </Sequence.Variables>
+    <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke #ApplicationName#.Info workflow" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_8" UnSafe="True" WorkflowFileName="Applications\#ApplicationName#\Actions\#ApplicationName#.Info.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="out_Info">[appInfo]</OutArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+    <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Trace" Message="[&quot;Login to &quot; &amp; appInfo(&quot;Name&quot;).ToString &amp; &quot;starting...&quot;]" />
+    <TryCatch DisplayName="Try Catch - login to #ApplicationName#" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+      <TryCatch.Try>
+        <ui:WindowScope SearchScope="{x:Null}" Selector="{x:Null}" TimeoutMS="{x:Null}" ApplicationWindow="[out_ApplicationWindow]" DisplayName="Attach to application #ApplicationName# window " sap2010:WorkflowViewState.IdRef="WindowScope_1" Window="[in_ApplicationWindow]">
+          <ui:WindowScope.Body>
+            <ActivityAction x:TypeArguments="x:Object">
+              <ActivityAction.Argument>
+                <DelegateInArgument x:TypeArguments="x:Object" Name="ContextTarget" />
+              </ActivityAction.Argument>
+              <Sequence sap2010:Annotation.AnnotationText="Because of a UiPath bug, please be informed that any ui  actions inside of a try catch block Try section should be invoked from a different workflow for traceability purpose otherwise the exception information does not contain proper debugging details like:&#xA;- activity display name that failed" DisplayName="Perform login sequance" sap2010:WorkflowViewState.IdRef="Sequence_2">
+                <ui:ShowWindow Window="{x:Null}" DisplayName="Show Window" sap2010:WorkflowViewState.IdRef="ShowWindow_1" />
+                <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_4" Level="Info" Message="[&quot;Login to &quot; &amp; appInfo(&quot;Name&quot;).ToString &amp; &quot; successfull&quot;]" />
+              </Sequence>
+            </ActivityAction>
+          </ui:WindowScope.Body>
+        </ui:WindowScope>
+      </TryCatch.Try>
+      <TryCatch.Catches>
+        <Catch x:TypeArguments="s:Exception" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+          <ActivityAction x:TypeArguments="s:Exception">
+            <ActivityAction.Argument>
+              <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
+            </ActivityAction.Argument>
+            <Sequence DisplayName="Log Message &amp; handle" sap2010:WorkflowViewState.IdRef="Sequence_5">
+              <Sequence.Variables>
+                <Variable x:TypeArguments="s:ApplicationException" Name="appException" />
+                <Variable x:TypeArguments="x:String" Name="exMessage" />
+              </Sequence.Variables>
+              <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_6" Level="Fatal" Message="[&quot;Application &quot; &amp; appInfo(&quot;Name&quot;).ToString &amp; &quot; failed to login&quot;]" />
+              <maes:AddToDictionary x:TypeArguments="x:String, x:Object" Dictionary="[appInfo]" DisplayName="Add ACTION to dictionary &lt;appInfo&gt;" sap2010:WorkflowViewState.IdRef="AddToDictionary`2_2" Key="Action" Value="[&quot;Login&quot;]" />
+              <Assign DisplayName="Assign &lt;exMessage&gt;" sap2010:WorkflowViewState.IdRef="Assign_3">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:String">[exMessage]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:String">[String.Format("Application #ApplicationName# failed to login with exception type [{0}] at source [{1}] with message: {2}",exception.GetType.Name,exception.Source,exception.Message)]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke #ApplicationName#.ApplicationException.Build workflow" UnSafe="False" WorkflowFileName="Applications\#ApplicationName#\ExceptionHandlers\#ApplicationName#.ApplicationException.Build.xaml">
+                <ui:InvokeWorkflowFile.Arguments>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_Message">[exMessage]</InArgument>
+                  <InArgument x:TypeArguments="x:String" x:Key="in_Source">[exception.Source]</InArgument>
+                  <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="in_ApplicationInfo">[appInfo]</InArgument>
+                  <OutArgument x:TypeArguments="s:ApplicationException" x:Key="out_ApplicationException">[appException]</OutArgument>
+                </ui:InvokeWorkflowFile.Arguments>
+                <sap2010:WorkflowViewState.IdRef>InvokeWorkflowFile_9</sap2010:WorkflowViewState.IdRef>
+              </ui:InvokeWorkflowFile>
+              <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke #ApplicationName#.ApplicationsExceptionHandler workflow" UnSafe="False" WorkflowFileName="Applications\#ApplicationName#\ExceptionHandlers\#ApplicationName#.ApplicationsExceptionHandler.xaml">
+                <ui:InvokeWorkflowFile.Arguments>
+                  <InArgument x:TypeArguments="s:ApplicationException" x:Key="in_Exception">[appException]</InArgument>
+                  <InArgument x:TypeArguments="ui:Window" x:Key="in_ApplicationWindow">[in_ApplicationWindow]</InArgument>
+                  <OutArgument x:TypeArguments="ui:Window" x:Key="out_ApplicationWindow">[out_ApplicationWindow]</OutArgument>
+                </ui:InvokeWorkflowFile.Arguments>
+                <sap2010:WorkflowViewState.IdRef>InvokeWorkflowFile_10</sap2010:WorkflowViewState.IdRef>
+              </ui:InvokeWorkflowFile>
+            </Sequence>
+          </ActivityAction>
+        </Catch>
+      </TryCatch.Catches>
+      <TryCatch.Finally>
+        <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_5" Level="Trace" Message="[&quot;Login to &quot; &amp; appInfo(&quot;Name&quot;).ToString &amp; &quot; ended&quot;]" />
+      </TryCatch.Finally>
+    </TryCatch>
+    <sads:DebugSymbol.Symbol>d1xDOlxVc2Vyc1x0cGF3bGlja1xEb2N1bWVudHNcVWlQYXRoXE5VRlxGcmFtZXdvcmtcQ29tcG9uZW50c1xBcHBsaWNhdGlvbnNcVGVtcGxhdGVcTG9naW4ueGFtbCVJA5IBDgIBAU0FUR0CATVSBVLWAQIBMlMFkAEQAgECT1xPZQIBN03CAU2GAgIBNlJzUtMBAgEzVQlhGgIBKI4BCY4B1QECASVpDYkBGAIBA1VrVYQBAgEwVfoBVZICAgEuWw9eGgIBKY4Bd44B0gECASZuD27oAQIBIm8Pb/kBAgEdcA93GAIBFngPgAEnAgEMgQEPiAEnAgEEXBFcfQIBLV0RXeIBAgEqbn1u5QECASNv4QFv9gECASFvVW9gAgEfb9IBb9oBAgEedTp18AECARlyO3JGAgEXek16WAIBFHxvfHgCARJ7THteAgEQeKwBeJACAgEPfWp9eAIBDYQBWIQBbgIBCoMBXYMBawIBCIUBWoUBcQIBBoEBrgGBAZQCAgEFXX5d3wECASs=</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_8" sap:VirtualizedContainerService.HintSize="414,87" />
+      <sap2010:ViewStateData Id="LogMessage_1" sap:VirtualizedContainerService.HintSize="414,91" />
+      <sap2010:ViewStateData Id="ShowWindow_1" sap:VirtualizedContainerService.HintSize="314,22" />
+      <sap2010:ViewStateData Id="LogMessage_4" sap:VirtualizedContainerService.HintSize="314,91" />
+      <sap2010:ViewStateData Id="Sequence_2" sap:VirtualizedContainerService.HintSize="336,379">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="WindowScope_1" sap:VirtualizedContainerService.HintSize="414,487" />
+      <sap2010:ViewStateData Id="LogMessage_6" sap:VirtualizedContainerService.HintSize="314,91" />
+      <sap2010:ViewStateData Id="AddToDictionary`2_2" sap:VirtualizedContainerService.HintSize="314,70">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_3" sap:VirtualizedContainerService.HintSize="314,60" />
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_9" sap:VirtualizedContainerService.HintSize="314,87" />
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_10" sap:VirtualizedContainerService.HintSize="314,87" />
+      <sap2010:ViewStateData Id="Sequence_5" sap:VirtualizedContainerService.HintSize="336,679">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Catch`1_1" sap:VirtualizedContainerService.HintSize="400,748">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="LogMessage_5" sap:VirtualizedContainerService.HintSize="314.4,92.8" />
+      <sap2010:ViewStateData Id="TryCatch_1" sap:VirtualizedContainerService.HintSize="414,910" />
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="436,1334">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Login_1" sap:VirtualizedContainerService.HintSize="476,1414" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>

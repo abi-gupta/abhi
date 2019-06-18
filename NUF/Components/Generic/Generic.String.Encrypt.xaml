@@ -1,0 +1,543 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="Generic_String_Encrypt"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:s="clr-namespace:System;assembly=mscorlib"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:si="clr-namespace:System.IO;assembly=mscorlib"
+ xmlns:ssc="clr-namespace:System.Security.Cryptography;assembly=mscorlib"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property sap2010:Annotation.AnnotationText="Text to encrypt" Name="in_PlainText" Type="InArgument(x:String)" />
+    <x:Property sap2010:Annotation.AnnotationText="Password phrase which is used to encrypt the string" Name="in_PasswordPhrase" Type="InArgument(x:String)" />
+    <x:Property sap2010:Annotation.AnnotationText="Encrypted string" Name="out_EncryptedText" Type="OutArgument(x:String)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Generic_String_Encrypt_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Security.Cryptography</x:String>
+      <x:String>System.Text</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.Collections.Immutable</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualStudio.Services.Common</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Encrypt a string with usage of pass phrase" DisplayName="Generic.String.Encrypt" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:Int32" Default="256" Name="keySize" />
+      <Variable x:TypeArguments="x:Int32" Default="1000" Name="derivationIterations" />
+      <Variable x:TypeArguments="s:Byte[]" Name="saltStringBytes" />
+      <Variable x:TypeArguments="s:Byte[]" Name="ivStringBytes" />
+      <Variable x:TypeArguments="s:Byte[]" Name="plainTextBytes" />
+      <Variable x:TypeArguments="ssc:Rfc2898DeriveBytes" Name="password" />
+    </Sequence.Variables>
+    <ui:LogMessage sap2010:Annotation.AnnotationText="Salt and IV is randomly generated each time, but is preprended to encrypted cipher text so that the same Salt and IV values can be used when decrypting.&#xD;&#xA;Creates the final bytes as a concatenation of the random salt bytes, the random iv bytes and the cipher bytes." DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Trace" Message="Generic.String.Encrypt" />
+    <TryCatch DisplayName="Get saltStringBytes" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+      <TryCatch.Variables>
+        <Variable x:TypeArguments="ssc:RNGCryptoServiceProvider" Name="rngCsp" />
+      </TryCatch.Variables>
+      <TryCatch.Finally>
+        <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_2" MethodName="Dispose">
+          <InvokeMethod.TargetObject>
+            <InArgument x:TypeArguments="ssc:RNGCryptoServiceProvider">[rngCsp]</InArgument>
+          </InvokeMethod.TargetObject>
+        </InvokeMethod>
+      </TryCatch.Finally>
+      <TryCatch.Try>
+        <Sequence sap2010:WorkflowViewState.IdRef="Sequence_2">
+          <Sequence.Variables>
+            <Variable x:TypeArguments="s:Byte[]" Name="randomBytes" />
+          </Sequence.Variables>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_1">
+            <Assign.To>
+              <OutArgument x:TypeArguments="s:Byte[]">[randomBytes]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="s:Byte[]">[new Byte(31){}]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_2">
+            <Assign.To>
+              <OutArgument x:TypeArguments="ssc:RNGCryptoServiceProvider">[rngCsp]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="ssc:RNGCryptoServiceProvider">[New RNGCryptoServiceProvider]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <InvokeMethod sap2010:Annotation.AnnotationText="Fill the array with cryptographically secure random bytes" DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_1" MethodName="GetBytes">
+            <InvokeMethod.TargetObject>
+              <InArgument x:TypeArguments="ssc:RNGCryptoServiceProvider">[rngCsp]</InArgument>
+            </InvokeMethod.TargetObject>
+            <InArgument x:TypeArguments="s:Byte[]">[randomBytes]</InArgument>
+          </InvokeMethod>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_4">
+            <Assign.To>
+              <OutArgument x:TypeArguments="s:Byte[]">[saltStringBytes]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="s:Byte[]">[randomBytes]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </Sequence>
+      </TryCatch.Try>
+    </TryCatch>
+    <TryCatch DisplayName="Get ivStringBytes" sap2010:WorkflowViewState.IdRef="TryCatch_2">
+      <TryCatch.Variables>
+        <Variable x:TypeArguments="ssc:RNGCryptoServiceProvider" Name="rngCsp" />
+      </TryCatch.Variables>
+      <TryCatch.Finally>
+        <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_3" MethodName="Dispose">
+          <InvokeMethod.TargetObject>
+            <InArgument x:TypeArguments="ssc:RNGCryptoServiceProvider">[rngCsp]</InArgument>
+          </InvokeMethod.TargetObject>
+        </InvokeMethod>
+      </TryCatch.Finally>
+      <TryCatch.Try>
+        <Sequence sap2010:WorkflowViewState.IdRef="Sequence_4">
+          <Sequence.Variables>
+            <Variable x:TypeArguments="s:Byte[]" Name="randomBytes" />
+          </Sequence.Variables>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_5">
+            <Assign.To>
+              <OutArgument x:TypeArguments="s:Byte[]">[randomBytes]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="s:Byte[]">[new Byte(31){}]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_6">
+            <Assign.To>
+              <OutArgument x:TypeArguments="ssc:RNGCryptoServiceProvider">[rngCsp]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="ssc:RNGCryptoServiceProvider">[New RNGCryptoServiceProvider]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <InvokeMethod sap2010:Annotation.AnnotationText="Fill the array with cryptographically secure random bytes" DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_4" MethodName="GetBytes">
+            <InvokeMethod.TargetObject>
+              <InArgument x:TypeArguments="ssc:RNGCryptoServiceProvider">[rngCsp]</InArgument>
+            </InvokeMethod.TargetObject>
+            <InArgument x:TypeArguments="s:Byte[]">[randomBytes]</InArgument>
+          </InvokeMethod>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_7">
+            <Assign.To>
+              <OutArgument x:TypeArguments="s:Byte[]">[ivStringBytes]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="s:Byte[]">[randomBytes]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </Sequence>
+      </TryCatch.Try>
+    </TryCatch>
+    <Assign sap2010:WorkflowViewState.IdRef="Assign_8">
+      <Assign.To>
+        <OutArgument x:TypeArguments="s:Byte[]">[plainTextBytes]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="s:Byte[]">[Encoding.UTF8.GetBytes(in_PlainText)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <TryCatch DisplayName="Try Catch - Rfc2898DeriveBytes" sap2010:WorkflowViewState.IdRef="TryCatch_3">
+      <TryCatch.Finally>
+        <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_5" MethodName="Dispose">
+          <InvokeMethod.TargetObject>
+            <InArgument x:TypeArguments="ssc:Rfc2898DeriveBytes">[password]</InArgument>
+          </InvokeMethod.TargetObject>
+        </InvokeMethod>
+      </TryCatch.Finally>
+      <TryCatch.Try>
+        <Sequence sap2010:WorkflowViewState.IdRef="Sequence_5">
+          <Sequence.Variables>
+            <Variable x:TypeArguments="s:Byte[]" Name="keyBytes" />
+          </Sequence.Variables>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_10">
+            <Assign.To>
+              <OutArgument x:TypeArguments="ssc:Rfc2898DeriveBytes">[password]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="ssc:Rfc2898DeriveBytes">[new Rfc2898DeriveBytes(in_PasswordPhrase,saltStringBytes,derivationIterations)]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_11">
+            <Assign.To>
+              <OutArgument x:TypeArguments="s:Byte[]">[keyBytes]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="s:Byte[]">[password.GetBytes(keySize\8)]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <TryCatch DisplayName="RijndaelManaged" sap2010:WorkflowViewState.IdRef="TryCatch_4">
+            <TryCatch.Variables>
+              <Variable x:TypeArguments="ssc:ICryptoTransform" Name="encryptor" />
+              <Variable x:TypeArguments="ssc:RijndaelManaged" Name="symmetricKey" />
+            </TryCatch.Variables>
+            <TryCatch.Finally>
+              <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_6" MethodName="Dispose">
+                <InvokeMethod.TargetObject>
+                  <InArgument x:TypeArguments="ssc:RijndaelManaged">[symmetricKey]</InArgument>
+                </InvokeMethod.TargetObject>
+              </InvokeMethod>
+            </TryCatch.Finally>
+            <TryCatch.Try>
+              <Sequence sap2010:WorkflowViewState.IdRef="Sequence_6">
+                <Assign sap2010:WorkflowViewState.IdRef="Assign_12">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="ssc:RijndaelManaged">[symmetricKey]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="ssc:RijndaelManaged">[new RijndaelManaged]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign sap2010:WorkflowViewState.IdRef="Assign_13">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:Int32">[symmetricKey.BlockSize]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:Int32">256</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign sap2010:WorkflowViewState.IdRef="Assign_14">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="ssc:CipherMode">[symmetricKey.Mode]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="ssc:CipherMode">[CipherMode.CBC]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <Assign sap2010:WorkflowViewState.IdRef="Assign_15">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="ssc:PaddingMode">[symmetricKey.Padding]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="ssc:PaddingMode">[PaddingMode.PKCS7]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <TryCatch DisplayName="CreateEncryptor" sap2010:WorkflowViewState.IdRef="TryCatch_5">
+                  <TryCatch.Finally>
+                    <Assign sap2010:WorkflowViewState.IdRef="Assign_16">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="ssc:ICryptoTransform">[encryptor]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="ssc:ICryptoTransform">[Nothing]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                  </TryCatch.Finally>
+                  <TryCatch.Try>
+                    <Sequence sap2010:WorkflowViewState.IdRef="Sequence_7">
+                      <Assign sap2010:WorkflowViewState.IdRef="Assign_17">
+                        <Assign.To>
+                          <OutArgument x:TypeArguments="ssc:ICryptoTransform">[encryptor]</OutArgument>
+                        </Assign.To>
+                        <Assign.Value>
+                          <InArgument x:TypeArguments="ssc:ICryptoTransform">[symmetricKey.CreateEncryptor(keyBytes, ivStringBytes)]</InArgument>
+                        </Assign.Value>
+                      </Assign>
+                      <TryCatch DisplayName="MemoryStream" sap2010:WorkflowViewState.IdRef="TryCatch_6">
+                        <TryCatch.Variables>
+                          <Variable x:TypeArguments="si:MemoryStream" Name="memoryStream" />
+                        </TryCatch.Variables>
+                        <TryCatch.Finally>
+                          <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_7" MethodName="Dispose">
+                            <InvokeMethod.TargetObject>
+                              <InArgument x:TypeArguments="si:MemoryStream">[memoryStream]</InArgument>
+                            </InvokeMethod.TargetObject>
+                          </InvokeMethod>
+                        </TryCatch.Finally>
+                        <TryCatch.Try>
+                          <Sequence sap2010:WorkflowViewState.IdRef="Sequence_8">
+                            <Assign sap2010:WorkflowViewState.IdRef="Assign_18">
+                              <Assign.To>
+                                <OutArgument x:TypeArguments="si:MemoryStream">[memoryStream]</OutArgument>
+                              </Assign.To>
+                              <Assign.Value>
+                                <InArgument x:TypeArguments="si:MemoryStream">[New MemoryStream]</InArgument>
+                              </Assign.Value>
+                            </Assign>
+                            <TryCatch DisplayName="CryptoStream" sap2010:WorkflowViewState.IdRef="TryCatch_7">
+                              <TryCatch.Variables>
+                                <Variable x:TypeArguments="ssc:CryptoStream" Name="cryptoStream" />
+                              </TryCatch.Variables>
+                              <TryCatch.Finally>
+                                <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_8" MethodName="Dispose">
+                                  <InvokeMethod.TargetObject>
+                                    <InArgument x:TypeArguments="ssc:CryptoStream">[cryptoStream]</InArgument>
+                                  </InvokeMethod.TargetObject>
+                                </InvokeMethod>
+                              </TryCatch.Finally>
+                              <TryCatch.Try>
+                                <Sequence sap2010:WorkflowViewState.IdRef="Sequence_9">
+                                  <Sequence.Variables>
+                                    <Variable x:TypeArguments="s:Byte[]" Name="cipherTextBytes" />
+                                  </Sequence.Variables>
+                                  <Assign sap2010:WorkflowViewState.IdRef="Assign_19">
+                                    <Assign.To>
+                                      <OutArgument x:TypeArguments="ssc:CryptoStream">[cryptoStream]</OutArgument>
+                                    </Assign.To>
+                                    <Assign.Value>
+                                      <InArgument x:TypeArguments="ssc:CryptoStream">[New CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write)]</InArgument>
+                                    </Assign.Value>
+                                  </Assign>
+                                  <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_9" MethodName="Write">
+                                    <InvokeMethod.TargetObject>
+                                      <InArgument x:TypeArguments="ssc:CryptoStream">[cryptoStream]</InArgument>
+                                    </InvokeMethod.TargetObject>
+                                    <InArgument x:TypeArguments="s:Byte[]">[plainTextBytes]</InArgument>
+                                    <InArgument x:TypeArguments="x:Int32">0</InArgument>
+                                    <InArgument x:TypeArguments="x:Int32">[plainTextBytes.Length]</InArgument>
+                                  </InvokeMethod>
+                                  <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_10" MethodName="FlushFinalBlock">
+                                    <InvokeMethod.TargetObject>
+                                      <InArgument x:TypeArguments="ssc:CryptoStream">[cryptoStream]</InArgument>
+                                    </InvokeMethod.TargetObject>
+                                  </InvokeMethod>
+                                  <Assign sap2010:WorkflowViewState.IdRef="Assign_20">
+                                    <Assign.To>
+                                      <OutArgument x:TypeArguments="s:Byte[]">[cipherTextBytes]</OutArgument>
+                                    </Assign.To>
+                                    <Assign.Value>
+                                      <InArgument x:TypeArguments="s:Byte[]">[saltStringBytes]</InArgument>
+                                    </Assign.Value>
+                                  </Assign>
+                                  <Assign sap2010:WorkflowViewState.IdRef="Assign_21">
+                                    <Assign.To>
+                                      <OutArgument x:TypeArguments="s:Byte[]">[cipherTextBytes]</OutArgument>
+                                    </Assign.To>
+                                    <Assign.Value>
+                                      <InArgument x:TypeArguments="s:Byte[]">[cipherTextBytes.Concat(ivStringBytes).ToArray]</InArgument>
+                                    </Assign.Value>
+                                  </Assign>
+                                  <Assign sap2010:WorkflowViewState.IdRef="Assign_22">
+                                    <Assign.To>
+                                      <OutArgument x:TypeArguments="s:Byte[]">[cipherTextBytes]</OutArgument>
+                                    </Assign.To>
+                                    <Assign.Value>
+                                      <InArgument x:TypeArguments="s:Byte[]">[cipherTextBytes.Concat(memoryStream.ToArray).ToArray]</InArgument>
+                                    </Assign.Value>
+                                  </Assign>
+                                  <InvokeMethod DisplayName="Invoke Method" sap2010:WorkflowViewState.IdRef="InvokeMethod_11" MethodName="Close">
+                                    <InvokeMethod.TargetObject>
+                                      <InArgument x:TypeArguments="ssc:CryptoStream">[cryptoStream]</InArgument>
+                                    </InvokeMethod.TargetObject>
+                                  </InvokeMethod>
+                                  <Assign sap2010:WorkflowViewState.IdRef="Assign_23">
+                                    <Assign.To>
+                                      <OutArgument x:TypeArguments="x:String">[out_EncryptedText]</OutArgument>
+                                    </Assign.To>
+                                    <Assign.Value>
+                                      <InArgument x:TypeArguments="x:String">[Convert.ToBase64String(cipherTextBytes)]</InArgument>
+                                    </Assign.Value>
+                                  </Assign>
+                                </Sequence>
+                              </TryCatch.Try>
+                            </TryCatch>
+                          </Sequence>
+                        </TryCatch.Try>
+                      </TryCatch>
+                    </Sequence>
+                  </TryCatch.Try>
+                </TryCatch>
+              </Sequence>
+            </TryCatch.Try>
+          </TryCatch>
+        </Sequence>
+      </TryCatch.Try>
+    </TryCatch>
+    <sads:DebugSymbol.Symbol>d1JDOlxVc2Vyc1x0b21la1xEb2N1bWVudHNcVWlQYXRoXE5VRlxDb21wb25lbnRzXEdlbmVyaWNcR2VuZXJpYy5TdHJpbmcuRW5jcnlwdC54YW1sbU4DkQMOAgEBUDNQOAIBA1EzUTkCAQJXBVfDAwMBmAFYBYgBEAMBgQGJAQW5ARACAWq6AQXBAQ4CAWbCAQWPAxACAQRXqANXwAMDAZkBZAmGARQDAYUBXQlhGAMBggGVAQm3ARQCAW6OAQmSARgCAWu/ATC/AVYCAWm8ATG8AUECAWfLAQmNAxQCAQjEAQnIARgCAQVoC28UAwGUAXALdxQDAZABeAt9GgMBiwF+C4UBFAMBhgFfSF9QAwGDAZkBC6ABFAIBfaEBC6gBFAIBeakBC64BGgIBdK8BC7YBFAIBb5ABSJABUAIBbM8BC9YBFAIBYtcBC94BFAIBXN8BC4wDFgIBCcYBQsYBTAIBBm02bUYDAZcBajdqRAMBlQF1SnVoAwGTAXJLclMDAZEBfDR8QQMBjgF6SnpSAwGMAYMBNoMBQwMBiQGAATeAAUgDAYcBngE2ngFGAwGAAZsBN5sBRAIBfqYBSqYBaAIBfKMBS6MBUwIBeq0BNK0BQQIBd6sBSqsBUgIBdbQBNrQBQwIBcrEBN7EBRgIBcNQBRNQBlAECAWXRAUXRAU8CAWPcATbcAVQCAV/ZATfZAUECAV3sAQ+KAxoCAQ3lAQ/pAR4CAQrtARH0ARoCAVj1ARH8ARoCAVT9ARGEAhoCAVCFAhGMAhoCAUyNAhGJAxwCAQ7nAUXnAVMCAQvyAUfyAVwCAVvvAUjvAVYCAVn6ATv6AT4CAVf3ATz3AVQCAVWCAkKCAlICAVP/AUP/AVYCAVGKAkOKAlYCAU+HAkSHAloCAU2ZAhWHAyACAROPAhWWAh4CAQ+aAhehAiACAUWiAheGAyICARSUAkyUAlUCARKRAk2RAlgCARCfAk6fAoUBAgFInAJPnAJaAgFGrgIbhAMmAgEYpwIbqwIqAgEVrwIdtgImAgFBtwIdgwMoAgEZqQJNqQJbAgEWtAJPtAJhAgFEsQJQsQJeAgFCwwIhgQMsAgEdvAIhwAIwAgEaxwIjzgIsAgE9zwIj1gIyAgE11wIj2wIyAgEy3AIj4wIsAgEt5AIj6wIsAgEp7AIj8wIsAgEl9AIj+AIyAgEi+QIjgAMsAgEevgJUvgJiAgEbzAJWzAKZAQIBQMkCV8kCZQIBPtQCS9QCTAIBPNMCTNMCXAIBOtUCS9UCYgIBONECVtECZAIBNtkCVtkCZAIBM+ECTuECXwIBMN4CT94CYAIBLukCTukCfQIBLOYCT+YCYAIBKvECTvEChAECASjuAk/uAmACASb2Alb2AmQCASP+Ak7+AncCASH7Ak/7AmICAR8=</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="LogMessage_1" sap:VirtualizedContainerService.HintSize="314.4,216.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="InvokeMethod_2" sap:VirtualizedContainerService.HintSize="217.6,132.8" />
+      <sap2010:ViewStateData Id="Assign_1" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="Assign_2" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_1" sap:VirtualizedContainerService.HintSize="243.2,192.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_4" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="Sequence_2" sap:VirtualizedContainerService.HintSize="265.6,617.6">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_1" sap:VirtualizedContainerService.HintSize="314.4,52.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="InvokeMethod_3" sap:VirtualizedContainerService.HintSize="217.6,132.8" />
+      <sap2010:ViewStateData Id="Assign_5" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="Assign_6" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_4" sap:VirtualizedContainerService.HintSize="243.2,192.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_7" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="Sequence_4" sap:VirtualizedContainerService.HintSize="265.6,617.6">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_2" sap:VirtualizedContainerService.HintSize="314.4,52.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_8" sap:VirtualizedContainerService.HintSize="314.4,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_5" sap:VirtualizedContainerService.HintSize="217.6,132.8" />
+      <sap2010:ViewStateData Id="Assign_10" sap:VirtualizedContainerService.HintSize="537.6,60" />
+      <sap2010:ViewStateData Id="Assign_11" sap:VirtualizedContainerService.HintSize="537.6,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_6" sap:VirtualizedContainerService.HintSize="217.6,132.8" />
+      <sap2010:ViewStateData Id="Assign_12" sap:VirtualizedContainerService.HintSize="497.6,60" />
+      <sap2010:ViewStateData Id="Assign_13" sap:VirtualizedContainerService.HintSize="497.6,60" />
+      <sap2010:ViewStateData Id="Assign_14" sap:VirtualizedContainerService.HintSize="497.6,60" />
+      <sap2010:ViewStateData Id="Assign_15" sap:VirtualizedContainerService.HintSize="497.6,60" />
+      <sap2010:ViewStateData Id="Assign_16" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="Assign_17" sap:VirtualizedContainerService.HintSize="457.6,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_7" sap:VirtualizedContainerService.HintSize="217.6,132.8" />
+      <sap2010:ViewStateData Id="Assign_18" sap:VirtualizedContainerService.HintSize="417.6,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_8" sap:VirtualizedContainerService.HintSize="217.6,132.8" />
+      <sap2010:ViewStateData Id="Assign_19" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_9" sap:VirtualizedContainerService.HintSize="243.2,132.8" />
+      <sap2010:ViewStateData Id="InvokeMethod_10" sap:VirtualizedContainerService.HintSize="243.2,132.8" />
+      <sap2010:ViewStateData Id="Assign_20" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="Assign_21" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="Assign_22" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_11" sap:VirtualizedContainerService.HintSize="243.2,132.8" />
+      <sap2010:ViewStateData Id="Assign_23" sap:VirtualizedContainerService.HintSize="243.2,60" />
+      <sap2010:ViewStateData Id="Sequence_9" sap:VirtualizedContainerService.HintSize="265.6,1103.2">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_7" sap:VirtualizedContainerService.HintSize="417.6,1311.2" />
+      <sap2010:ViewStateData Id="Sequence_8" sap:VirtualizedContainerService.HintSize="440,1536">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_6" sap:VirtualizedContainerService.HintSize="457.6,1744" />
+      <sap2010:ViewStateData Id="Sequence_7" sap:VirtualizedContainerService.HintSize="480,1968.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_5" sap:VirtualizedContainerService.HintSize="497.6,2176.8" />
+      <sap2010:ViewStateData Id="Sequence_6" sap:VirtualizedContainerService.HintSize="520,2701.6">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_4" sap:VirtualizedContainerService.HintSize="537.6,2909.6" />
+      <sap2010:ViewStateData Id="Sequence_5" sap:VirtualizedContainerService.HintSize="560,3234.4">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_3" sap:VirtualizedContainerService.HintSize="314.4,52.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="336.8,748">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Generic_String_Encrypt_1" sap:VirtualizedContainerService.HintSize="376.8,828" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>

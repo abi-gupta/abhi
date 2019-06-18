@@ -1,0 +1,194 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="Validate_Path"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:s="clr-namespace:System;assembly=mscorlib"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property sap2010:Annotation.AnnotationText="Default: False. If set TRUE specified path have to exists" Name="in_MustExist" Type="InArgument(x:Boolean)" />
+    <x:Property sap2010:Annotation.AnnotationText="Path that is beeing validated" Name="in_Path" Type="InArgument(x:String)">
+      <x:Property.Attributes>
+        <RequiredArgumentAttribute />
+      </x:Property.Attributes>
+    </x:Property>
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>CheckInputFolder_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>Microsoft.VisualBasic.CompilerServices</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Collections.Immutable</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualStudio.Services.Common</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Checks if path provided in argument in_Path is valid. &#xA;Full path string is validated against invalid path characters.&#xA;&#xA;Exceptions:&#xA; - ArgumentException - invalid characters found in path. Index of invalid character is in exception message&#xA; - FileNotFoundException - provided file path is not found&#xA; - DirectoryNotFoundException - provided directory path is not found" DisplayName="Main" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:Boolean" Name="pathExists" />
+      <Variable x:TypeArguments="s:Char[]" Name="invalidCharacters" />
+      <Variable x:TypeArguments="x:String" Name="pathNotExistsMessage" />
+    </Sequence.Variables>
+    <Assign DisplayName="Assign invalidCharacters" sap2010:WorkflowViewState.IdRef="Assign_12">
+      <Assign.To>
+        <OutArgument x:TypeArguments="s:Char[]">[invalidCharacters]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="s:Char[]">[Path.GetInvalidPathChars]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <If Condition="[in_Path.Any(Function(x) invalidCharacters.Contains(x))]" DisplayName="If - path contain invalid characters" sap2010:WorkflowViewState.IdRef="If_17">
+      <If.Then>
+        <Throw DisplayName="ArgumentException" Exception="[New ArgumentException(String.Format(&quot;Path contains invalid characters!. Position index: {0}&quot;,in_Path.IndexOfAny(invalidCharacters)))]" sap2010:WorkflowViewState.IdRef="Throw_16" />
+      </If.Then>
+    </If>
+    <If Condition="[in_MustExist]" DisplayName="If - must exists" sap2010:WorkflowViewState.IdRef="If_18">
+      <If.Then>
+        <Sequence sap2010:WorkflowViewState.IdRef="Sequence_8">
+          <If Condition="[Path.HasExtension(in_Path)]" DisplayName="Check if path exists" sap2010:WorkflowViewState.IdRef="If_20">
+            <If.Then>
+              <ui:PathExists DisplayName="Path Exists" Exists="[pathExists]" sap2010:WorkflowViewState.IdRef="PathExists_5" Path="[in_Path]" PathType="File" />
+            </If.Then>
+            <If.Else>
+              <ui:PathExists DisplayName="Path Exists" Exists="[pathExists]" sap2010:WorkflowViewState.IdRef="PathExists_4" Path="[in_Path]" PathType="Folder" />
+            </If.Else>
+          </If>
+          <If Condition="[Not pathExists]" DisplayName="If - path not exists" sap2010:WorkflowViewState.IdRef="If_19">
+            <If.Then>
+              <Sequence DisplayName="Thorw exception" sap2010:WorkflowViewState.IdRef="Sequence_7">
+                <Assign DisplayName="Assign pathNotExistsMessage" sap2010:WorkflowViewState.IdRef="Assign_13">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:String">[pathNotExistsMessage]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:String">[String.Format("Path [{0}] not exists!",in_Path)]</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <If Condition="[Path.HasExtension(in_Path)]" DisplayName="Throw file or directory not found" sap2010:WorkflowViewState.IdRef="If_21">
+                  <If.Then>
+                    <Throw DisplayName="FileNotFoundException" Exception="[New FileNotFoundException(pathNotExistsMessage)]" sap2010:WorkflowViewState.IdRef="Throw_18" />
+                  </If.Then>
+                  <If.Else>
+                    <Throw DisplayName="DirectoryNotFoundException" Exception="[New DirectoryNotFoundException(pathNotExistsMessage)]" sap2010:WorkflowViewState.IdRef="Throw_17" />
+                  </If.Else>
+                </If>
+              </Sequence>
+            </If.Then>
+          </If>
+        </Sequence>
+      </If.Then>
+    </If>
+    <sads:DebugSymbol.Symbol>d0pDOlxVc2Vyc1x0b21la1xEb2N1bWVudHNcVWlQYXRoXE5VRlxDb21wb25lbnRzXFZhbGlkYXRlXFZhbGlkYXRlLlBhdGgueGFtbB9NA4UBDgIBAVMFWg4CASVbBV8KAgEhYAWDAQoCAQJYMFhKAgEoVTFVRAIBJlsTW00CASJdCV36AQIBI2ATYCMCAQNiCYEBFAIBBV06XcwBAgEkYwtqEAIBFWsLgAEQAgEGYxljNwIBFmUPZaABAgEcaA9oogECARdrGWsrAgEHbQ9+GgIBCWU/ZU0CAR9lggFljQECAR1oP2hNAgEaaIIBaI0BAgEYbhF1GgIBEHYRfRYCAQpzPHNtAgETcD1wUwIBEXYfdj0CAQt4FXirAQIBDnsVe7UBAgEMeEp4fQIBD3tPe4cBAgEN</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="Assign_12" sap:VirtualizedContainerService.HintSize="758.4,60" />
+      <sap2010:ViewStateData Id="Throw_16" sap:VirtualizedContainerService.HintSize="200,22" />
+      <sap2010:ViewStateData Id="If_17" sap:VirtualizedContainerService.HintSize="758.4,52.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="PathExists_5" sap:VirtualizedContainerService.HintSize="314,89" />
+      <sap2010:ViewStateData Id="PathExists_4" sap:VirtualizedContainerService.HintSize="314,89" />
+      <sap2010:ViewStateData Id="If_20" sap:VirtualizedContainerService.HintSize="611.2,52.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_13" sap:VirtualizedContainerService.HintSize="464,60" />
+      <sap2010:ViewStateData Id="Throw_18" sap:VirtualizedContainerService.HintSize="200,22.4" />
+      <sap2010:ViewStateData Id="Throw_17" sap:VirtualizedContainerService.HintSize="200,22.4" />
+      <sap2010:ViewStateData Id="If_21" sap:VirtualizedContainerService.HintSize="464,209.6" />
+      <sap2010:ViewStateData Id="Sequence_7" sap:VirtualizedContainerService.HintSize="486.4,434.4">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_19" sap:VirtualizedContainerService.HintSize="611.2,584" />
+      <sap2010:ViewStateData Id="Sequence_8" sap:VirtualizedContainerService.HintSize="633.6,801.6">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_18" sap:VirtualizedContainerService.HintSize="758.4,951.2">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="780.8,1392.8">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="CheckInputFolder_1" sap:VirtualizedContainerService.HintSize="820.8,1472.8" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>

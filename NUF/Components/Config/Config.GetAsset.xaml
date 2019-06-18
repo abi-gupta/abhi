@@ -1,0 +1,161 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="Config_GetAsset" this:Config_GetAsset.in_AssetScope="Solution"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:sd="clr-namespace:System.Data;assembly=System.Data"
+ xmlns:si="clr-namespace:System.IO;assembly=mscorlib"
+ xmlns:this="clr-namespace:"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property sap2010:Annotation.AnnotationText="Asset name that will be retrived from configuration excel file" Name="in_AssetName" Type="InArgument(x:String)">
+      <x:Property.Attributes>
+        <RequiredArgumentAttribute />
+      </x:Property.Attributes>
+    </x:Property>
+    <x:Property sap2010:Annotation.AnnotationText="[Default: &quot;Solution&quot;] Asset scope that will be retrived from configuration excel file" Name="in_AssetScope" Type="InArgument(x:String)" />
+    <x:Property sap2010:Annotation.AnnotationText="Retrived value from configuration excel file" Name="out_Value" Type="OutArgument(x:Object)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Config_GetAsset_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Xml.Serialization</x:String>
+      <x:String>Microsoft.VisualBasic.CompilerServices</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.Collections.Immutable</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualStudio.Services.Common</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Retrives asset from configuration excel file with name and scope provided with arguments.&#xA;&#xA;Exceptions:&#xA; - NullReferenceException - when asset is not found" DisplayName="Config.GetAsset" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="scg:Dictionary(x:String, x:Object)" Name="solutionConfig" />
+      <Variable x:TypeArguments="x:String" Name="tempConfigFile" />
+    </Sequence.Variables>
+    <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke Get.Configuration workflow" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Solution\Get.Configuration.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:Object)" x:Key="out_SolutionConfiguration">[solutionConfig]</OutArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+    <Assign DisplayName="Assign &lt;tempConfigFile&gt;" sap2010:WorkflowViewState.IdRef="Assign_7">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[tempConfigFile]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[Guid.NewGuid.ToString+".xlsx"]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:CopyFile ContinueOnError="{x:Null}" Destination="[Path.Combine(solutionConfig(&quot;ConfigFilePath&quot;).ToString,tempConfigFile)]" DisplayName="Copy config file to temp file" sap2010:WorkflowViewState.IdRef="CopyFile_1" Overwrite="True" Path="[Path.Combine(solutionConfig(&quot;ConfigFilePath&quot;).ToString,&quot;Config.xlsx&quot;)]" />
+    <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke File.SetAttributes to &lt;tempConfigFile&gt; hidden" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_2" UnSafe="False" WorkflowFileName="Components\File\File.SetAttributes.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_Path">[Path.Combine(solutionConfig("ConfigFilePath").ToString,tempConfigFile)]</InArgument>
+        <InArgument x:TypeArguments="si:FileAttributes" x:Key="in_Attributes">[FileAttributes.Hidden]</InArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+    <Sequence DisplayName="Read from config file" sap2010:WorkflowViewState.IdRef="Sequence_7">
+      <Sequence.Variables>
+        <Variable x:TypeArguments="sd:DataTable" Name="configTable" />
+      </Sequence.Variables>
+      <ui:ReadRange Range="{x:Null}" AddHeaders="True" DataTable="[configTable]" DisplayName="Read Range - read Config.xlsx &lt;Assets&gt; sheet" sap2010:WorkflowViewState.IdRef="ReadRange_1" SheetName="Assets" WorkbookPath="[Path.Combine(solutionConfig(&quot;ConfigFilePath&quot;).ToString,tempConfigFile)]" />
+      <If Condition="[configTable.AsEnumerable().Count(Function(x) x(&quot;Name&quot;).ToString.ToLower = in_AssetName.ToLower AndAlso x(&quot;Scope&quot;).ToString.ToLower = in_AssetScope.ToString.ToLower) &gt; 0]" DisplayName="If - requested asset exists" sap2010:WorkflowViewState.IdRef="If_5">
+        <If.Then>
+          <Assign DisplayName="Assign out_Value" sap2010:WorkflowViewState.IdRef="Assign_6">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Object">[out_Value]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Object">[configTable.AsEnumerable().First(Function(x) x("Name").ToString.ToLower = in_AssetName.ToLower AndAlso x("Scope").ToString.ToLower = in_AssetScope.ToString.ToLower)("Value")]</InArgument>
+            </Assign.Value>
+          </Assign>
+        </If.Then>
+        <If.Else>
+          <Throw DisplayName="NullReferenceException" Exception="[New NullReferenceException(String.Format(&quot;Asset name [{0}] with scope [{1}] has not been found.&quot;,in_AssetName,in_AssetScope))]" sap2010:WorkflowViewState.IdRef="Throw_1" />
+        </If.Else>
+      </If>
+    </Sequence>
+    <ui:Delete ContinueOnError="{x:Null}" DisplayName="Delete &lt;tempConfigFile&gt;" sap2010:WorkflowViewState.IdRef="Delete_1" Path="[Path.Combine(solutionConfig(&quot;ConfigFilePath&quot;).ToString,tempConfigFile)]" />
+    <sads:DebugSymbol.Symbol>d11DOlxVc2Vyc1xhZ3VwdDE1NVxEb2N1bWVudHNcTy5GLkYuSS5DLkkuQS5MXFVpUGF0aFxOVUZcQ29tcG9uZW50c1xDb25maWdcQ29uZmlnLkdldEFzc2V0LnhhbWwdAWgBcQECUgOCAQ4CAQFXBVsdAgEdXAVjDgIBGWQFZN0CAgEWZQVqHQIBEmsFfxACAQSAAQWAAd4BAgECWW1ZfQIBH1e+AVffAQIBHmEwYU8CARxeMV5BAgEaZDlkjQECARhk/QFk2gICARdoT2hmAgEVZ0BniAECARRl1wFlgAICARNvB2+4AgIBDXAHfgwCAQWAAYcBgAHbAQIBA29Cb1ECARBvywFv0wECAQ9v4QFvtQICAQ5wFXDYAQIBBnILeRQCAQl8C3z5AQIBB3c2d+UBAgEMdDd0QgIBCnxBfMwBAgEI</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_1" sap:VirtualizedContainerService.HintSize="489,87" />
+      <sap2010:ViewStateData Id="Assign_7" sap:VirtualizedContainerService.HintSize="489,60" />
+      <sap2010:ViewStateData Id="CopyFile_1" sap:VirtualizedContainerService.HintSize="489,22" />
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_2" sap:VirtualizedContainerService.HintSize="489,87" />
+      <sap2010:ViewStateData Id="ReadRange_1" sap:VirtualizedContainerService.HintSize="467,87" />
+      <sap2010:ViewStateData Id="Assign_6" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Throw_1" sap:VirtualizedContainerService.HintSize="200,22" />
+      <sap2010:ViewStateData Id="If_5" sap:VirtualizedContainerService.HintSize="467,208" />
+      <sap2010:ViewStateData Id="Sequence_7" sap:VirtualizedContainerService.HintSize="489,459">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Delete_1" sap:VirtualizedContainerService.HintSize="489,22" />
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="511,1148">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Config_GetAsset_1" sap:VirtualizedContainerService.HintSize="551,1228" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>

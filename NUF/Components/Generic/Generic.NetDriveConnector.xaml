@@ -1,0 +1,189 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="NetDriveConnector" this:NetDriveConnector.in_DisconnectOnly="True"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:sn="clr-namespace:System.Net;assembly=System"
+ xmlns:this="clr-namespace:"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_DisconnectOnly" Type="InArgument(x:Boolean)" />
+    <x:Property Name="in_NetDrivePath" Type="InArgument(x:String)" />
+    <x:Property Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="in_Credentials" Type="InArgument(sn:NetworkCredential)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Main_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>System.Net</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualStudio.Services.Common</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Task:&#xA;- Disconnect from network drives&#xA;- Connect to provided network drive path if in_disconnectOnly is set to False&#xA;&#xA;Input:&#xA;- in_driveAssetName, Name of Asset containing the network drive path&#xA;- in_credsAssetName, Name of Asset containing the network drive credentials&#xA;- in_disconnectOnly, determines whether to only disconnect network drives or also connect to specified network drive&#xA;&#xA;Preconditions:&#xA;- driveAssetName should be created in Orchestrator&#xA;- credsAssetName should be created in Orchestrator&#xA;&#xA;Postconditions:&#xA;- Network drives are disconnected&#xA;- Connected to specified network drive if in_disconnectOnly is set to False&#xA;- In case of invalid input data, disconnecting failure or connecting failure, an exception is thrown&#xA;&#xA;TODO:&#xA;- Check if network drive is disconnected&#xA;- Check if network drive is accessible&#xA;- Is it possible to not disconnect from internal (Azure) shared storage drive?" DisplayName="NetDriveConnector" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <ui:LogMessage DisplayName="Log message" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Trace" Message="NetDriveConnector - Start" />
+    <Sequence DisplayName="Validate input data" sap2010:WorkflowViewState.IdRef="Sequence_13">
+      <If Condition="[Not in_disconnectOnly]" DisplayName="If - Not &lt;in_disconnectOnly&gt;" sap2010:WorkflowViewState.IdRef="If_7">
+        <If.Then>
+          <Sequence DisplayName="Not disconnect only, also connect to network drive" sap2010:WorkflowViewState.IdRef="Sequence_14">
+            <ui:InvokeWorkflowFile ContinueOnError="{x:Null}" DisplayName="Invoke Validate.String workflow" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_3" UnSafe="False" WorkflowFileName="Components\Validate\Validate.String.xaml">
+              <ui:InvokeWorkflowFile.Arguments>
+                <InOutArgument x:TypeArguments="x:String" x:Key="io_String">[in_NetDrivePath]</InOutArgument>
+                <InArgument x:TypeArguments="x:Boolean" x:Key="in_AllowEmpty">False</InArgument>
+              </ui:InvokeWorkflowFile.Arguments>
+            </ui:InvokeWorkflowFile>
+          </Sequence>
+        </If.Then>
+      </If>
+    </Sequence>
+    <Sequence DisplayName="Disconnect network drive" sap2010:WorkflowViewState.IdRef="Sequence_12">
+      <ui:InvokePowerShell x:TypeArguments="x:String" ContinueOnError="{x:Null}" CommandText="[&quot;net use /persistent:no&quot; + vbNewLine + &quot;net use * /delete /yes&quot;]" DisplayName="Invoke power shell - Disconnect network drives" sap2010:WorkflowViewState.IdRef="InvokePowerShell`1_4" IsScript="True" />
+      <ui:Comment sap2010:WorkflowViewState.IdRef="Comment_2" Text="// TODO: Check if network drive is disconnected" />
+      <If Condition="True" DisplayName="If failed to disconnect from network drives, throw exception" sap2010:WorkflowViewState.IdRef="If_5">
+        <If.Else>
+          <Throw Exception="[New Exception(&quot;NetDriveConnector - Failed to disconnect network drives&quot;)]" sap2010:WorkflowViewState.IdRef="Throw_1" />
+        </If.Else>
+      </If>
+    </Sequence>
+    <If Condition="[Not in_disconnectOnly]" DisplayName="If disconnectOnly is True, skip this step" sap2010:WorkflowViewState.IdRef="If_4">
+      <If.Then>
+        <Sequence DisplayName="Connect network drive" sap2010:WorkflowViewState.IdRef="Sequence_11">
+          <ui:InvokePowerShell x:TypeArguments="x:String" ContinueOnError="{x:Null}" CommandText="&amp; net use K: $drive /u:$user $pass" DisplayName="Invoke power shell - Connect network drive" sap2010:WorkflowViewState.IdRef="InvokePowerShell`1_7" IsScript="True">
+            <ui:InvokePowerShell.PowerShellVariables>
+              <InArgument x:TypeArguments="x:String" x:Key="drive">["""" + in_netDrivePath + """"]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="user">[in_Credentials.UserName]</InArgument>
+              <InArgument x:TypeArguments="x:String" x:Key="pass">[in_Credentials.Password]</InArgument>
+            </ui:InvokePowerShell.PowerShellVariables>
+          </ui:InvokePowerShell>
+          <ui:Comment sap2010:WorkflowViewState.IdRef="Comment_1" Text="// TODO: Check if network drive is accessible" />
+          <If Condition="True" DisplayName="If failed to connect to network drive, throw exception" sap2010:WorkflowViewState.IdRef="If_6">
+            <If.Then>
+              <ui:LogMessage DisplayName="Log message" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="NetDriveConnector - Successfully connected to network drive" />
+            </If.Then>
+            <If.Else>
+              <Throw Exception="[New Exception(&quot;NetDriveConnector - Failed to connect to network drive&quot;)]" sap2010:WorkflowViewState.IdRef="Throw_2" />
+            </If.Else>
+          </If>
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <ui:LogMessage DisplayName="Log message" sap2010:WorkflowViewState.IdRef="LogMessage_4" Level="Info" Message="NetDriveConnector - Successfully disconnected from network drive" />
+      </If.Else>
+    </If>
+    <ui:LogMessage DisplayName="Log message" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Trace" Message="NetDriveConnector - End" />
+    <sads:DebugSymbol.Symbol>d1hDOlxVc2Vyc1x0cGF3bGlja1xEb2N1bWVudHNcVWlQYXRoXE5VRlxDb21wb25lbnRzXEdlbmVyaWNcR2VuZXJpYy5OZXREcml2ZUNvbm5lY3Rvci54YW1sJwFwAXUBAkgDfA4CAQFJBUmRAQIBK0oFVxACASFYBWAQAgEZYQV5CgIBBHoFeo8BAgECSXNJjgECASxLB1YMAgEiWQdZvAICAR9aB1p4AgEeWwdfDAIBGmETYSwCAQVjCXQUAgEJdwl3uwECAQd6c3qMAQIBA0sVSy4CASNNC1QWAgElWV5ZtQECASBbFVsbAgEbXQtdnwECARxkC2ohAgERawtregIBEGwLcxACAQp3dne4AQIBCE4NUyUCASZdHF1yAgEdaENoXAIBF2RiZIoBAgEWZ0NnXAIBFGZEZmMCARJsGWwfAgELbg9uvAECAQ5xD3GiAQIBDFFPUVQCASpQTVBeAgEoTsQBTu4BAgEnbnxuuQECAQ9xIHF1AgEN</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="LogMessage_2" sap:VirtualizedContainerService.HintSize="900,91" />
+      <sap2010:ViewStateData Id="InvokeWorkflowFile_3" sap:VirtualizedContainerService.HintSize="314,87" />
+      <sap2010:ViewStateData Id="Sequence_14" sap:VirtualizedContainerService.HintSize="336,211">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_7" sap:VirtualizedContainerService.HintSize="200,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_13" sap:VirtualizedContainerService.HintSize="900,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="InvokePowerShell`1_4" sap:VirtualizedContainerService.HintSize="464,59" />
+      <sap2010:ViewStateData Id="Comment_2" sap:VirtualizedContainerService.HintSize="464,74" />
+      <sap2010:ViewStateData Id="Throw_1" sap:VirtualizedContainerService.HintSize="200,22" />
+      <sap2010:ViewStateData Id="If_5" sap:VirtualizedContainerService.HintSize="464,208" />
+      <sap2010:ViewStateData Id="Sequence_12" sap:VirtualizedContainerService.HintSize="900,545">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="InvokePowerShell`1_7" sap:VirtualizedContainerService.HintSize="539,59" />
+      <sap2010:ViewStateData Id="Comment_1" sap:VirtualizedContainerService.HintSize="539,55" />
+      <sap2010:ViewStateData Id="LogMessage_1" sap:VirtualizedContainerService.HintSize="314,91" />
+      <sap2010:ViewStateData Id="Throw_2" sap:VirtualizedContainerService.HintSize="200,22" />
+      <sap2010:ViewStateData Id="If_6" sap:VirtualizedContainerService.HintSize="539,239" />
+      <sap2010:ViewStateData Id="Sequence_11" sap:VirtualizedContainerService.HintSize="561,557">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="LogMessage_4" sap:VirtualizedContainerService.HintSize="314,91" />
+      <sap2010:ViewStateData Id="If_4" sap:VirtualizedContainerService.HintSize="900,705" />
+      <sap2010:ViewStateData Id="LogMessage_3" sap:VirtualizedContainerService.HintSize="900,91" />
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="922,2109">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Main_1" sap:VirtualizedContainerService.HintSize="962,2189" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>
